@@ -96,15 +96,16 @@ public class Cliente {
         //Abrimos la comunicación con el puerto de servicio
         Cliente cliente = new Cliente("localhost",49175);
         try {
+            //Abrimos la comunicación
+            cliente.start();
+            cliente.abrirCanalesDeTexto();
             do {
-                //Abrimos la comunicación
-                cliente.start();
-                cliente.abrirCanalesDeTexto();
+
 
                 //Enviar mensajes al servidor
                 BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-                System.out.println("Mensaje a enviar (END para terminar): ");
+                System.out.print("Mensaje a enviar (END para terminar): ");
                 mensaje = br.readLine();
                 cliente.enviarMensajeTexto(mensaje);
 
@@ -113,9 +114,10 @@ public class Cliente {
                 //System.out.println ( "Mensaje del servidor:"+mensajeRecibido);
 
                 //Cerramos la comunicación
-                cliente.cerrarCanalesDeTexto();
+
 
             } while (!mensaje.equals("END"));
+            cliente.cerrarCanalesDeTexto();
             cliente.stop();
 
         } catch (UnknownHostException e) {
