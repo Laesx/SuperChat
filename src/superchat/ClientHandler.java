@@ -16,6 +16,9 @@ class ClientHandler extends Thread {
     private BufferedReader br;
     private PrintWriter pw;
 
+    private String nombre = "Anónimo";
+
+
     public ClientHandler(Socket socket, TestServidor server) throws IOException {
         this.socket = socket;
         this.server = server;
@@ -84,5 +87,13 @@ class ClientHandler extends Thread {
                 System.out.println("Couldn't close a socket, what's going on?");
             }
         }
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
     }
 }

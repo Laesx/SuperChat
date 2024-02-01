@@ -3,6 +3,8 @@ package superchat;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 public class TestServidor {
@@ -118,9 +120,10 @@ public class TestServidor {
     public void broadcast(String message, ClientHandler sender) throws IOException {
         for (ClientHandler client : clientes) {
             if (client != sender) {
-                client.sendMessage(message);
+                client.sendMessage(LocalDateTime.now().format(DateTimeFormatter.ofPattern("(HH:mm)")) + " " + client.getNombre() + ": " + message);
             }
         }
+        System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("(HH:mm)")) + " " + sender.getNombre() + ": " + message);
     }
 
     public void stop() throws IOException {

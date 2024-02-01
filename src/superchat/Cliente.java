@@ -1,5 +1,7 @@
 package superchat;
 
+import superchat.GUI.Chat;
+
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -16,6 +18,11 @@ public class Cliente {
     private InputStreamReader isr;
     private BufferedReader br;
     private PrintWriter pw;
+
+    // Guardar el nombre del usuario
+    private String nombre = "Anónimo";
+
+    private Chat chat;
 
     public Cliente (String serverIP, int serverPort) {
         this.serverIP = serverIP;
@@ -35,7 +42,9 @@ public class Cliente {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(is));
                 String message;
                 while ((message = reader.readLine()) != null) {
-                    System.out.println("Mensaje del servidor: " + message);
+                    //System.out.println("Mensaje del servidor: " + message);
+                    System.out.println(message);
+                    chat.addServerMessage(message);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -128,4 +137,7 @@ public class Cliente {
 
     }
 
+    public void setChat(Chat chat) {
+        this.chat = chat;
+    }
 }

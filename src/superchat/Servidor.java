@@ -9,6 +9,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  *
@@ -37,7 +38,8 @@ public class Servidor {
         socket=serverSocket.accept();
         is = socket.getInputStream();
         os = socket.getOutputStream();
-        System.out.println(" (Servidor) Conexión establecida con cliente "+socket.getRemoteSocketAddress());
+        System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("(HH:mm:ss)")) +
+                " (Servidor) Conexión establecida con cliente "+socket.getRemoteSocketAddress());
         SocketAddress sa = socket.getRemoteSocketAddress();
         return(sa);
     }
