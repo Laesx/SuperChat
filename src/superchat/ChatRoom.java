@@ -1,12 +1,14 @@
 package superchat;
 
+import superchat.Helper.Historial;
+
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static superchat.Servidor.guardarMensajeTexto;
+import static superchat.Helper.Historial.guardarMensajeTexto;
 
 public class ChatRoom {
     private List<ClientHandler> clients = new ArrayList<>();
@@ -35,7 +37,7 @@ public class ChatRoom {
         }
         System.out.println(formattedMessage);
         // Lo guarda en el archivo de texto
-        guardarMensajeTexto(formattedMessage);
+        guardarMensajeTexto(formattedMessage, nombre);
     }
 
     public String getNombre() {

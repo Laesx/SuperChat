@@ -1,5 +1,7 @@
 package superchat;
 
+
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -7,45 +9,29 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
-public class Servidor {
+import static superchat.Helper.Historial.guardarMensajeTexto;
+import static superchat.Helper.Historial.recuperarChat;
 
+public class Servidor {
     private ServerSocket serverSocket;
 
     private static ArrayList<ClientHandler> clientes = new ArrayList<>();
 
     private ArrayList<ChatRoom> chatRooms = new ArrayList<>();
 
-    private InputStream is;
-    private OutputStream os;
-
-    // Objetos para envío de cadenas
-    private InputStreamReader isr;
-    private BufferedReader br;
-    private PrintWriter pw;
-
     public Servidor(int puerto) throws IOException {
         serverSocket = new ServerSocket(puerto);
     }
 
     public void start () throws IOException {
-        System.out.println(" (Servidor) Esperando conexiones...");
+        System.out.println("(Servidor) Esperando conexiones...");
         chatRooms.add(new ChatRoom("#General"));
         chatRooms.add(new ChatRoom("#Offtopic"));
         chatRooms.add(new ChatRoom("#Juegos"));
         while (true) {
             Socket socket=serverSocket.accept();
-            ClientHandler clientThread = new ClientHandler(socket, this);
-            clientes.add(clientThread);
-
-            // TODO TEST PARA SALAS
-            chatRooms.get(0).addClient(clientThread);
-            clientThread.setSalaTexto(chatRooms.get(0));
-
-            clientThread.start();
-            // TODO Provisionalmente llamar a un método que envíe el chat a los clientes
-            clientThread.sendMessage(recuperarChat());
-
-            clientThread.sendServerMessage("Bienvenido a SuperChat. Escribe /help para ver los comandos disponibles.");
+            //ClientHandler clientThread =
+            inicializarCliente(new ClientHandler(socket, this));
         }
 
         /*
@@ -55,55 +41,25 @@ public class Servidor {
         */
     }
 
-    // abrimos los canales de lectura y de escritura
-    public void abrirCanalesDeTexto() {
-        //System.out.println(" (Servidor) Abriendo canales de texto...");
-        //Canales de lectura
-        isr = new InputStreamReader(is);
-        br = new BufferedReader(isr);
-        //Canales de escritura
-        pw = new PrintWriter(os, true);
-        //System.out.println("(ServidorAntiguo) Cerrando canales de texto.");
-    }
+    /** Inicializa un cliente que se ha conectado al servidor
+     * @param clientThread El hilo del cliente que se ha conectado
+     */
+    private void inicializarCliente(ClientHandler clientThread) {
+        clientes.add(clientThread);
 
-    // cerramos los canales de lectura y de escritura
-    public void cerrarCanalesDeTexto() throws IOException {
-        //System.out.println(" (Servidor) Cerrando canales de texto...");
-        //Canales de lectura
-        br.close();
-        isr.close();
-        //Canales de escritura
-        pw.close();
-        //System.out.println("(ServidorAntiguo) Cerrando canales de texto.");
-    }
+        // TODO TEST PARA SALAS
+        chatRooms.get(0).addClient(clientThread);
+        clientThread.setSalaTexto(chatRooms.get(0));
 
-    // Guarda el mensaje en un archivo de texto
-    public static void guardarMensajeTexto(String mensaje) {
+        clientThread.start();
 
-        try {
-            FileWriter fw = new FileWriter("chat.txt", true);
-            fw.write("\r\n"+mensaje);
-            fw.close();
-        } catch (Exception e) {
-            System.out.println("Error guardando el archivo de texto: " + e);
-        }
-    }
-
-    // Recupera el chat desde el archivo de texto
-    public String recuperarChat(){
-        String chat = "";
-        try {
-            FileReader fr = new FileReader("chat.txt");
-            BufferedReader br = new BufferedReader(fr);
-            String linea;
-            while((linea = br.readLine()) != null){
-                chat += linea + "\n";
-            }
-            fr.close();
-        } catch (Exception e) {
-            System.out.println("Error recuperando el archivo de texto: " + e);
-        }
-        return chat;
+        // Enviar mensajes de bienvenida y parámetros iniciales
+        clientThread.sendMessage("$setUser " + clientThread.getNombre());
+        clientThread.sendMessage("$setRoom " + chatRooms.get(0).getNombre());
+        clientThread.sendServerMessage("Bienvenido a SuperChat. Escribe /help para ver los comandos disponibles.");
+        clientThread.sendServerMessage("Te has unido a " + chatRooms.get(0).getNombre());
+        // TODO Provisionalmente llamar a un método que envíe el chat a los clientes
+        clientThread.sendMessage(recuperarChat(clientThread.getSalaTexto().getNombre()));
     }
 
 
@@ -128,7 +84,7 @@ public class Servidor {
         }
         System.out.println(formattedMessage);
         // Lo guarda en el archivo de texto
-        guardarMensajeTexto(formattedMessage);
+        //guardarMensajeTexto(formattedMessage);
     }
 
     // TODO Esto seguramente habría que hacerlo más seguro para que los usuarios no puedan enviar comandos que no deben
@@ -163,8 +119,10 @@ public class Servidor {
                 break;
             case "/help":
                 sender.sendServerMessage("Comandos disponibles: /nick, /list, /msg, /quit, /help");
+                sender.sendServerMessage("Comandos de sala: /create, /join, /leave, /room");
+                sender.sendServerMessage("Para saber más sobre un comando, escribe /help [comando]");
                 break;
-            case "/join":
+            case "/join", "$joinRoom":
                 for (ChatRoom chatRoom : chatRooms) {
                     if (chatRoom.getNombre().equals(parts[1])) {
                         // Añade al cliente a la sala
@@ -190,11 +148,18 @@ public class Servidor {
                 sender.sendServerMessage("Sala de texto actual: " + sender.getSalaTexto().getNombre());
                 break;
             // Esta sección es para comandos que vienen internamente del cliente
-            case "$getChats":
-                sender.sendMessage(recuperarChat());
+            case "$getMessages":
+                sender.sendMessage(recuperarChat(sender.getSalaTexto().getNombre()));
                 break;
             case "$getRooms":
                 //System.out.println("Enviando lista de salas");
+                /*
+                String listaSalas = "";
+                for (ChatRoom chatRoom : chatRooms) {
+                    listaSalas += "$roomName" + chatRoom.getNombre() + "\n";
+                }
+                sender.sendMessage(listaSalas);
+                */
                 for (ChatRoom chatRoom : chatRooms) {
                     sender.sendMessage("$roomName " + chatRoom.getNombre());
                 }

@@ -5,8 +5,6 @@
 package superchat.GUI;
 
 import superchat.Cliente;
-import superchat.GUI.Modelos.ModeloLista;
-
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Style;
@@ -26,7 +24,7 @@ public class Chat extends javax.swing.JFrame {
     
     private Cliente cliente;
 
-    private DefaultListModel<String> modeloLista;
+    private final DefaultListModel<String> modeloLista;
 
     /**
      * Creates new form Chat
@@ -39,9 +37,13 @@ public class Chat extends javax.swing.JFrame {
         modeloLista = new DefaultListModel<>();
         jList.setModel(modeloLista);
 
-        cliente.setChat(this);
+        setNombre(cliente.getNombre());
 
         cliente.enviarMensajeTexto("$getRooms");
+    }
+
+    public void setNombre(String nombre){
+        userLabel.setText("Usuario: " + nombre);
     }
 
     public void addRoom(String room){
@@ -50,23 +52,32 @@ public class Chat extends javax.swing.JFrame {
     }
     
     private void startCliente(){
-        String mensaje;
 
         //Abrimos la comunicación con el puerto de servicio
-        cliente = new Cliente("localhost",49175);
+        cliente = new Cliente("localhost",49175, this);
         try {
             //Abrimos la comunicación
             cliente.start();
             cliente.abrirCanalesDeTexto();
 
-            //cliente.cerrarCanalesDeTexto();
-            //cliente.stop();
-
         } catch (UnknownHostException e) {
-            e.printStackTrace();
+            System.out.println("Error al conectar al servidor: " + e.getMessage());
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Error en la comunicacion con el servidor: " + e.getMessage());
         }
+    }
+
+    public void stopCliente(){
+        try {
+            cliente.cerrarCanalesDeTexto();
+            cliente.stop();
+        } catch (IOException e) {
+            System.out.println("Error al cerrar la comunicacion con el servidor: " + e.getMessage());
+        }
+    }
+
+    public void setRoomLabel(String room){
+        roomLabel.setText("Sala Actual: " + room);
     }
 
     /**
@@ -81,12 +92,14 @@ public class Chat extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jList = new javax.swing.JList<>();
-        jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        textPane = new javax.swing.JTextPane();
         entradaTexto = new javax.swing.JTextField();
         botonEnviar = new javax.swing.JButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        textPane = new javax.swing.JTextPane();
+        roomButton = new javax.swing.JButton();
+        userLabel = new javax.swing.JLabel();
+        roomLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -104,9 +117,6 @@ public class Chat extends javax.swing.JFrame {
             }
         });
         jScrollPane1.setViewportView(jList);
-
-        textPane.setEditable(false);
-        jScrollPane2.setViewportView(textPane);
 
         entradaTexto.setToolTipText("Introduzca su mensaje...");
         entradaTexto.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -127,16 +137,17 @@ public class Chat extends javax.swing.JFrame {
             }
         });
 
+        jScrollPane2.setViewportView(textPane);
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jScrollPane2)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(entradaTexto, javax.swing.GroupLayout.DEFAULT_SIZE, 493, Short.MAX_VALUE)
+                        .addComponent(entradaTexto, javax.swing.GroupLayout.DEFAULT_SIZE, 499, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(botonEnviar)))
                 .addContainerGap())
@@ -144,15 +155,23 @@ public class Chat extends javax.swing.JFrame {
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 384, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 384, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(entradaTexto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(botonEnviar)))
         );
 
-        jTabbedPane1.addTab("tab2", jPanel1);
+        roomButton.setText("Conectar a Sala");
+        roomButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                roomButtonActionPerformed(evt);
+            }
+        });
+
+        userLabel.setText("Usuario:");
+
+        roomLabel.setText("Sala Actual:");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -160,24 +179,34 @@ public class Chat extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jScrollPane1)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(roomButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTabbedPane1)
-                .addContainerGap())
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(roomLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(userLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(userLabel)
+                    .addComponent(roomLabel))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jTabbedPane1)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane1)))
-                .addContainerGap())
+                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 384, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(roomButton)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -203,6 +232,20 @@ public class Chat extends javax.swing.JFrame {
     }//GEN-LAST:event_jListValueChanged
 
     /**
+     * Conecta al usuario a la sala seleccionada
+     */
+    private void roomButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_roomButtonActionPerformed
+        String room = jList.getSelectedValue();
+        if (room != null) {
+            textPane.setText("");
+            cliente.enviarMensajeTexto("$joinRoom " + room);
+            cliente.enviarMensajeTexto("$getMessages " + room);
+            setRoomLabel(room);
+            //roomLabel.setText("Sala Actual: " + room);
+        }
+    }//GEN-LAST:event_roomButtonActionPerformed
+
+    /**
      * Envia el mensaje al servidor y lo añade en el chat
      */
     private void sendMessage(){
@@ -222,11 +265,11 @@ public class Chat extends javax.swing.JFrame {
 
         // Add user's text with the defined style
         try {
-            doc.insertString(doc.getLength(), "\n" +
+            doc.insertString(doc.getLength(),
                     LocalDateTime.now().format(DateTimeFormatter.ofPattern("(HH:mm)")) + " " +
-                    cliente.getNombre() + ": " + entradaTexto.getText(), styleUser);
+                    cliente.getNombre() + ": " + entradaTexto.getText() + "\n", styleUser);
         } catch (BadLocationException e) {
-            e.printStackTrace();
+            System.err.println("Error al añadir el mensaje al chat: " + e.getMessage());
         }
 
         entradaTexto.setText("");
@@ -243,9 +286,9 @@ public class Chat extends javax.swing.JFrame {
 
         // Add server's text with the defined style
         try {
-            doc.insertString(doc.getLength(), "\n" + message, styleServer);
+            doc.insertString(doc.getLength(), message + "\n", styleServer);
         } catch (BadLocationException e) {
-            e.printStackTrace();
+            System.err.println("Error al añadir el mensaje al chat: " + e.getMessage());
         }
         
     }
@@ -261,9 +304,9 @@ public class Chat extends javax.swing.JFrame {
 
         // Add server's text with the defined style
         try {
-            doc.insertString(doc.getLength(), "\n" + message, styleServer);
+            doc.insertString(doc.getLength(), message + "\n", styleServer);
         } catch (BadLocationException e) {
-            e.printStackTrace();
+            System.err.println("Error al añadir el mensaje al chat: " + e.getMessage());
         }
     }
     
@@ -310,7 +353,9 @@ public class Chat extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JButton roomButton;
+    private javax.swing.JLabel roomLabel;
     private javax.swing.JTextPane textPane;
+    private javax.swing.JLabel userLabel;
     // End of variables declaration//GEN-END:variables
 }

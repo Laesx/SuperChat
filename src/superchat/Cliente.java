@@ -25,12 +25,19 @@ public class Cliente {
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
+        chat.setNombre(nombre);
     }
 
     // Guardar el nombre del usuario
     private String nombre = "Anónimo";
 
     private Chat chat;
+
+    public Cliente (String serverIP, int serverPort, Chat chat) {
+        this.serverIP = serverIP;
+        this.serverPort = serverPort;
+        this.chat = chat;
+    }
 
     public Cliente (String serverIP, int serverPort) {
         this.serverIP = serverIP;
@@ -85,6 +92,9 @@ public class Cliente {
                 break;
             case "$roomName":
                 chat.addRoom(parts[1]);
+                break;
+            case "$setRoom":
+                chat.setRoomLabel(parts[1]);
                 break;
             default:
                 chat.addServerMessage("Comando no reconocido: " + comando);

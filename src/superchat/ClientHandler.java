@@ -23,14 +23,12 @@ class ClientHandler extends Thread {
     public ClientHandler(Socket socket, Servidor server) throws IOException {
         this.socket = socket;
         this.server = server;
-        //in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        //out = new PrintWriter(socket.getOutputStream(), true);
+
         is = socket.getInputStream();
         os = socket.getOutputStream();
         System.out.println("(Servidor) Conexión establecida con cliente: " + socket.getRemoteSocketAddress());
 
         //Canales de lectura
-        // ME PARECE QUE NO HACEN FALTA AQUI
         isr = new InputStreamReader(is);
         br = new BufferedReader(isr);
 
@@ -51,11 +49,8 @@ class ClientHandler extends Thread {
     public void run() {
         try {
             String mensaje;
-            //BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             while ((mensaje = br.readLine()) != null) {
-
-                System.out.println("Mensaje del cliente: " + mensaje);
-
+                //System.out.println("Mensaje del cliente: " + mensaje);
                 // Si el mensaje empieza por /, es un comando y no se enviará al chat
                 if (mensaje.startsWith("/") || mensaje.startsWith("$")) {
                     server.commands(mensaje, this);

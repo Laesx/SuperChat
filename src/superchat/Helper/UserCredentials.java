@@ -1,14 +1,13 @@
 package superchat.Helper;
 
 import java.io.*;
-import java.util.*;
 
 /**
  * Clase para manejar las credenciales de los usuarios
  * Las credenciales se encriptan y se guardan en un archivo de texto
  */
 public class UserCredentials {
-    private static final String CREDENTIALS_FILE = "usuarios.txt";
+    private static final String CREDENTIALS_FILE = "ficheros/usuarios.txt";
 
     /** Guarda las credenciales del usuario en un archivo de texto
      * @param username Nombre de usuario
