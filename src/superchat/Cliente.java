@@ -44,34 +44,35 @@ public class Cliente {
         is = socket.getInputStream();
         //System.out.println("(Cliente) Conexión establecida.");
 
-        // Start a new thread that will continuously read and print messages from the server
+        // Crear un hilo que continuamente lea y muestre los mensajes del servidor
+        // Esto es necesario porque el hilo principal se bloquearía al estar leyendo los mensajes
         new Thread(() -> {
             try {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(is));
                 String message;
+
                 while ((message = reader.readLine()) != null) {
                     //System.out.println("Mensaje del servidor: " + message);
                     if (message.startsWith("Sistema:")){
                         chat.addServerMessage(message);
                         continue;
                     }
+                    if (message.startsWith("$disconnect")){
+                        chat.addServerMessage("El servidor ha cerrado la conexión");
+                        stop();
+                        break;
+                    }
                     if (message.startsWith("$")){
                         //chat.addServerMessage(message);
                         handleCommands(message);
                         continue;
                     }
-                    // Comando para cambiar el nombre de usuario de parte del servidor
-                    /*
-                    if (message.startsWith("setUser:")){
-                        //String[] parts = message.split(" ");
-                        //this.setNombre(parts[1]);
-                        continue;
-                    }*/
                     System.out.println(message);
                     chat.addMessage(message);
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                chat.addServerMessage("Error al recibir mensajes del servidor");
+                //e.printStackTrace();
             }
         }).start();
     }
@@ -82,8 +83,14 @@ public class Cliente {
             case "$setUser":
                 this.setNombre(parts[1]);
                 break;
+            case "$roomName":
+                chat.addRoom(parts[1]);
+                break;
+            default:
+                chat.addServerMessage("Comando no reconocido: " + comando);
+                System.out.println("Comando no reconocido: " + comando);
+                break;
         }
-
 
     }
 
@@ -143,7 +150,6 @@ public class Cliente {
             cliente.start();
             cliente.abrirCanalesDeTexto();
             do {
-
 
                 //Enviar mensajes al servidor
                 BufferedReader br = new BufferedReader(new InputStreamReader(System.in));

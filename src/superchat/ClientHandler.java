@@ -27,7 +27,7 @@ class ClientHandler extends Thread {
         //out = new PrintWriter(socket.getOutputStream(), true);
         is = socket.getInputStream();
         os = socket.getOutputStream();
-        System.out.println("(ServidorAntiguo) Conexión establecida con cliente: " + socket.getRemoteSocketAddress());
+        System.out.println("(Servidor) Conexión establecida con cliente: " + socket.getRemoteSocketAddress());
 
         //Canales de lectura
         // ME PARECE QUE NO HACEN FALTA AQUI
@@ -53,26 +53,40 @@ class ClientHandler extends Thread {
             String mensaje;
             //BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             while ((mensaje = br.readLine()) != null) {
-                // Si el mensaje empieza por /, es un comando y no se enviará al chat
-                if (mensaje.startsWith("/")){
-                    //String[] parts = mensaje.split(" ");
-                    //this.setNombre(parts[1]);
 
-                    server.comando(mensaje, this);
+                System.out.println("Mensaje del cliente: " + mensaje);
+
+                // Si el mensaje empieza por /, es un comando y no se enviará al chat
+                if (mensaje.startsWith("/") || mensaje.startsWith("$")) {
+                    server.commands(mensaje, this);
                     // Sigue el loop para que no se envíe el mensaje al chat
                     continue;
                 }
-                server.broadcast(mensaje, this);
+
+                //server.broadcast(mensaje, this);
+                salaTexto.broadcast(mensaje, this);
             }
         } catch (IOException e) {
-            System.out.println("Error handling client: " + e);
+            System.out.println("Perdida conexión con el cliente: " + e);
         } finally {
             try {
                 socket.close();
             } catch (IOException e) {
-                System.out.println("Couldn't close a socket, what's going on?");
+                System.out.println("No se ha podido cerrar el socket: " + e);
             }
         }
+    }
+
+
+    /**
+     * Desconecta al cliente
+     */
+    public void disconnect () throws IOException {
+        //System.out.println("(Cliente) Cerrando conexiones.");
+        is.close();
+        os.close();
+        socket.close();
+        //System.out.println(" (Cliente) Conexiones cerradas.");
     }
 
     public String getNombre() {
@@ -81,5 +95,13 @@ class ClientHandler extends Thread {
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
+    }
+
+    public void setSalaTexto(ChatRoom salaTexto) {
+        this.salaTexto = salaTexto;
+    }
+
+    public ChatRoom getSalaTexto() {
+        return salaTexto;
     }
 }

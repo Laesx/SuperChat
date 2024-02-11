@@ -29,13 +29,23 @@ public class Servidor {
 
     public void start () throws IOException {
         System.out.println(" (Servidor) Esperando conexiones...");
+        chatRooms.add(new ChatRoom("#General"));
+        chatRooms.add(new ChatRoom("#Offtopic"));
+        chatRooms.add(new ChatRoom("#Juegos"));
         while (true) {
             Socket socket=serverSocket.accept();
             ClientHandler clientThread = new ClientHandler(socket, this);
             clientes.add(clientThread);
+
+            // TODO TEST PARA SALAS
+            chatRooms.get(0).addClient(clientThread);
+            clientThread.setSalaTexto(chatRooms.get(0));
+
             clientThread.start();
-            // Provisionalmente llamar a un método que envíe el chat a los clientes
+            // TODO Provisionalmente llamar a un método que envíe el chat a los clientes
             clientThread.sendMessage(recuperarChat());
+
+            clientThread.sendServerMessage("Bienvenido a SuperChat. Escribe /help para ver los comandos disponibles.");
         }
 
         /*
@@ -47,7 +57,7 @@ public class Servidor {
 
     // abrimos los canales de lectura y de escritura
     public void abrirCanalesDeTexto() {
-        //System.out.println(" (ServidorAntiguo) Abriendo canales de texto...");
+        //System.out.println(" (Servidor) Abriendo canales de texto...");
         //Canales de lectura
         isr = new InputStreamReader(is);
         br = new BufferedReader(isr);
@@ -58,7 +68,7 @@ public class Servidor {
 
     // cerramos los canales de lectura y de escritura
     public void cerrarCanalesDeTexto() throws IOException {
-        //System.out.println(" (ServidorAntiguo) Cerrando canales de texto...");
+        //System.out.println(" (Servidor) Cerrando canales de texto...");
         //Canales de lectura
         br.close();
         isr.close();
@@ -67,7 +77,8 @@ public class Servidor {
         //System.out.println("(ServidorAntiguo) Cerrando canales de texto.");
     }
 
-    public void guardarMensajeTexto(String mensaje) {
+    // Guarda el mensaje en un archivo de texto
+    public static void guardarMensajeTexto(String mensaje) {
 
         try {
             FileWriter fw = new FileWriter("chat.txt", true);
@@ -78,6 +89,7 @@ public class Servidor {
         }
     }
 
+    // Recupera el chat desde el archivo de texto
     public String recuperarChat(){
         String chat = "";
         try {
@@ -119,7 +131,8 @@ public class Servidor {
         guardarMensajeTexto(formattedMessage);
     }
 
-    public void comando(String mensaje, ClientHandler sender) throws IOException {
+    // TODO Esto seguramente habría que hacerlo más seguro para que los usuarios no puedan enviar comandos que no deben
+    public void commands(String mensaje, ClientHandler sender) throws IOException {
         String[] parts = mensaje.split(" ");
         switch (parts[0]) {
             case "/nick":
@@ -128,8 +141,9 @@ public class Servidor {
                 sender.sendMessage("$setUser " + sender.getNombre());
                 break;
             case "/list":
+                // TODO Implementar un método para enviar la lista de clientes
                 for (ClientHandler client : clientes) {
-                    sender.sendMessage("Server: "+ client.getNombre());
+                    sender.sendMessage("Sistema: "+ client.getNombre());
                 }
                 break;
             case "/msg":
@@ -140,16 +154,53 @@ public class Servidor {
                 }
                 break;
             case "/quit":
-                sender.sendMessage("Server: Adiós, " + sender.getNombre());
-                //sender.stop();
+                sender.sendServerMessage("Adiós, " + sender.getNombre());
+                //sender.sendMessage("Server: Adiós, " + sender.getNombre());
+                sender.sendMessage("$disconnect");
+                //sender.disconnect();
                 // Implementar un método para cerrar la conexión
-                //clientes.remove(sender);
+                clientes.remove(sender);
                 break;
             case "/help":
-                sender.sendMessage("Server: Comandos disponibles: /nick, /list, /msg, /quit, /help");
+                sender.sendServerMessage("Comandos disponibles: /nick, /list, /msg, /quit, /help");
+                break;
+            case "/join":
+                for (ChatRoom chatRoom : chatRooms) {
+                    if (chatRoom.getNombre().equals(parts[1])) {
+                        // Añade al cliente a la sala
+                        chatRoom.addClient(sender);
+                        // Borra al cliente de la sala en la que ya estaba
+                        sender.getSalaTexto().removeClient(sender);
+                        // Cambia la sala del cliente
+                        sender.setSalaTexto(chatRoom);
+                        sender.sendServerMessage("Te has unido a " + parts[1]);
+                    }
+                }
+                break;
+            case "/leave":
+                for (ChatRoom chatRoom : chatRooms) {
+                    if (chatRoom.getNombre().equals(parts[1])) {
+                        chatRoom.removeClient(sender);
+                        sender.setSalaTexto(null);
+                        sender.sendServerMessage("Has abandonado " + parts[1]);
+                    }
+                }
+                break;
+            case "/room":
+                sender.sendServerMessage("Sala de texto actual: " + sender.getSalaTexto().getNombre());
+                break;
+            // Esta sección es para comandos que vienen internamente del cliente
+            case "$getChats":
+                sender.sendMessage(recuperarChat());
+                break;
+            case "$getRooms":
+                //System.out.println("Enviando lista de salas");
+                for (ChatRoom chatRoom : chatRooms) {
+                    sender.sendMessage("$roomName " + chatRoom.getNombre());
+                }
                 break;
             default:
-                sender.sendMessage("Server: Comando no reconocido. Usa /help para ver los comandos disponibles.");
+                sender.sendServerMessage("Comando no reconocido. Usa /help para ver los comandos disponibles.");
                 break;
         }
     }

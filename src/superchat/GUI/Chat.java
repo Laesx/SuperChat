@@ -5,7 +5,9 @@
 package superchat.GUI;
 
 import superchat.Cliente;
+import superchat.GUI.Modelos.ModeloLista;
 
+import javax.swing.*;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
@@ -24,13 +26,27 @@ public class Chat extends javax.swing.JFrame {
     
     private Cliente cliente;
 
+    private DefaultListModel<String> modeloLista;
+
     /**
      * Creates new form Chat
      */
     public Chat() {
         initComponents();
         startCliente();
+
+        //modeloLista = new ModeloLista();
+        modeloLista = new DefaultListModel<>();
+        jList.setModel(modeloLista);
+
         cliente.setChat(this);
+
+        cliente.enviarMensajeTexto("$getRooms");
+    }
+
+    public void addRoom(String room){
+        System.out.println("Añadiendo sala: " + room);
+        modeloLista.addElement(room);
     }
     
     private void startCliente(){
@@ -64,7 +80,7 @@ public class Chat extends javax.swing.JFrame {
 
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jList1 = new javax.swing.JList<>();
+        jList = new javax.swing.JList<>();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
@@ -77,12 +93,17 @@ public class Chat extends javax.swing.JFrame {
         jLabel1.setFont(new java.awt.Font("Segoe UI Black", 0, 18)); // NOI18N
         jLabel1.setText("SUPER-CHAT");
 
-        jList1.setModel(new javax.swing.AbstractListModel<String>() {
+        jList.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
             public int getSize() { return strings.length; }
             public String getElementAt(int i) { return strings[i]; }
         });
-        jScrollPane1.setViewportView(jList1);
+        jList.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                jListValueChanged(evt);
+            }
+        });
+        jScrollPane1.setViewportView(jList);
 
         textPane.setEditable(false);
         jScrollPane2.setViewportView(textPane);
@@ -176,6 +197,10 @@ public class Chat extends javax.swing.JFrame {
             sendMessage();
         }
     }//GEN-LAST:event_entradaTextoKeyPressed
+
+    private void jListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jListValueChanged
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jListValueChanged
 
     /**
      * Envia el mensaje al servidor y lo añade en el chat
@@ -281,7 +306,7 @@ public class Chat extends javax.swing.JFrame {
     private javax.swing.JButton botonEnviar;
     private javax.swing.JTextField entradaTexto;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JList<String> jList1;
+    private javax.swing.JList<String> jList;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;

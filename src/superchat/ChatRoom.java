@@ -1,8 +1,12 @@
 package superchat;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+
+import static superchat.Servidor.guardarMensajeTexto;
 
 public class ChatRoom {
     private List<ClientHandler> clients = new ArrayList<>();
@@ -22,11 +26,16 @@ public class ChatRoom {
     }
 
     public synchronized void broadcast(String message, ClientHandler sender) throws IOException {
+        // TODO Standarizar esto a lo mejor?
+        String formattedMessage = LocalDateTime.now().format(DateTimeFormatter.ofPattern("(HH:mm)")) + " " + sender.getNombre() + ": " + message;
         for (ClientHandler client : clients) {
             if (client != sender) {
-                client.sendMessage(message);
+                client.sendMessage(formattedMessage);
             }
         }
+        System.out.println(formattedMessage);
+        // Lo guarda en el archivo de texto
+        guardarMensajeTexto(formattedMessage);
     }
 
     public String getNombre() {
