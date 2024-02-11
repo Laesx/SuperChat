@@ -2,11 +2,10 @@ package superchat;
 
 import java.io.*;
 import java.net.Socket;
-import java.time.LocalDateTime;
 
 class ClientHandler extends Thread {
     private Socket socket;
-    private TestServidor server;
+    private Servidor server;
 
     private InputStream is;
     private OutputStream os;
@@ -18,15 +17,17 @@ class ClientHandler extends Thread {
 
     private String nombre = "Anónimo";
 
+    private ChatRoom salaTexto;
 
-    public ClientHandler(Socket socket, TestServidor server) throws IOException {
+
+    public ClientHandler(Socket socket, Servidor server) throws IOException {
         this.socket = socket;
         this.server = server;
         //in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         //out = new PrintWriter(socket.getOutputStream(), true);
         is = socket.getInputStream();
         os = socket.getOutputStream();
-        System.out.println("(Servidor) Conexión establecida con cliente: " + socket.getRemoteSocketAddress());
+        System.out.println("(ServidorAntiguo) Conexión establecida con cliente: " + socket.getRemoteSocketAddress());
 
         //Canales de lectura
         // ME PARECE QUE NO HACEN FALTA AQUI
@@ -42,42 +43,27 @@ class ClientHandler extends Thread {
         pw.println(message);
     }
 
+    public void sendServerMessage(String message) {
+        pw.println("Sistema: " + message);
+    }
+
     @Override
     public void run() {
         try {
             String mensaje;
             //BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             while ((mensaje = br.readLine()) != null) {
+                // Si el mensaje empieza por /, es un comando y no se enviará al chat
+                if (mensaje.startsWith("/")){
+                    //String[] parts = mensaje.split(" ");
+                    //this.setNombre(parts[1]);
+
+                    server.comando(mensaje, this);
+                    // Sigue el loop para que no se envíe el mensaje al chat
+                    continue;
+                }
                 server.broadcast(mensaje, this);
             }
-            /*
-            do {
-                //servidor.abrirCanalesDeTexto();
-
-                // Tomamos la hora en la que se produce la interaccion
-                LocalDateTime horaLocal = LocalDateTime.now();
-                int horas  = horaLocal.getHour();
-                int minutos = horaLocal.getMinute();
-                int segundos = horaLocal.getSecond();
-
-                //Recepcion del mensaje del cliente
-                //mensaje = servidor.leerMensajeTexto();
-
-                mensaje = br.readLine();
-
-                //String salida=horas+":"+minutos+":"+segundos+" - Host "+host+": "+mensaje;
-                //System.out.println(salida);
-                //servidor.guardarMensajeTexto(salida);
-
-                //Envío de la confirmacion del mensaje al cliente
-                //servidor.enviarMensajeTexto("ACK "+horas+":"+minutos+":"+segundos);
-                pw.println("ACK "+horas+":"+minutos+":"+segundos);
-
-                //Cerramos el canal
-                //servidor.cerrarCanalesDeTexto();
-
-            } while (mensaje != null && !mensaje.equals("END"));
-            */
         } catch (IOException e) {
             System.out.println("Error handling client: " + e);
         } finally {

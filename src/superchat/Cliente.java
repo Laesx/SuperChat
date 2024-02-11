@@ -19,6 +19,14 @@ public class Cliente {
     private BufferedReader br;
     private PrintWriter pw;
 
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
     // Guardar el nombre del usuario
     private String nombre = "Anónimo";
 
@@ -43,13 +51,40 @@ public class Cliente {
                 String message;
                 while ((message = reader.readLine()) != null) {
                     //System.out.println("Mensaje del servidor: " + message);
+                    if (message.startsWith("Sistema:")){
+                        chat.addServerMessage(message);
+                        continue;
+                    }
+                    if (message.startsWith("$")){
+                        //chat.addServerMessage(message);
+                        handleCommands(message);
+                        continue;
+                    }
+                    // Comando para cambiar el nombre de usuario de parte del servidor
+                    /*
+                    if (message.startsWith("setUser:")){
+                        //String[] parts = message.split(" ");
+                        //this.setNombre(parts[1]);
+                        continue;
+                    }*/
                     System.out.println(message);
-                    chat.addServerMessage(message);
+                    chat.addMessage(message);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }).start();
+    }
+
+    private void handleCommands(String comando){
+        String[] parts = comando.split(" ");
+        switch (parts[0]) {
+            case "$setUser":
+                this.setNombre(parts[1]);
+                break;
+        }
+
+
     }
 
     public void stop () throws IOException {
@@ -98,7 +133,6 @@ public class Cliente {
 
 
     public static void main (String[] args) {
-
 
         String mensaje;
 

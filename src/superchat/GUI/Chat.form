@@ -147,8 +147,11 @@
             </Container>
             <Component class="javax.swing.JTextField" name="entradaTexto">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Introduzca su mensaje..."/>
+                <Property name="toolTipText" type="java.lang.String" value="Introduzca su mensaje..."/>
               </Properties>
+              <Events>
+                <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="entradaTextoKeyPressed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JButton" name="botonEnviar">
               <Properties>
@@ -156,6 +159,7 @@
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="botonEnviarActionPerformed"/>
+                <EventHandler event="keyPressed" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="botonEnviarKeyPressed"/>
               </Events>
             </Component>
           </SubComponents>

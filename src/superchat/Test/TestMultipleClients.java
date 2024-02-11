@@ -1,4 +1,6 @@
-package superchat;
+package superchat.Test;
+
+import superchat.Cliente;
 
 import java.io.IOException;
 

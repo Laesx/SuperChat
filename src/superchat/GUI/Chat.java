@@ -11,10 +11,10 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import java.awt.*;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.UnknownHostException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  *
@@ -87,12 +87,22 @@ public class Chat extends javax.swing.JFrame {
         textPane.setEditable(false);
         jScrollPane2.setViewportView(textPane);
 
-        entradaTexto.setText("Introduzca su mensaje...");
+        entradaTexto.setToolTipText("Introduzca su mensaje...");
+        entradaTexto.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                entradaTextoKeyPressed(evt);
+            }
+        });
 
         botonEnviar.setText("Enviar");
         botonEnviar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 botonEnviarActionPerformed(evt);
+            }
+        });
+        botonEnviar.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                botonEnviarKeyPressed(evt);
             }
         });
 
@@ -154,6 +164,23 @@ public class Chat extends javax.swing.JFrame {
 
     private void botonEnviarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonEnviarActionPerformed
         // TODO add your handling code here:
+        sendMessage();
+    }//GEN-LAST:event_botonEnviarActionPerformed
+
+    private void botonEnviarKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_botonEnviarKeyPressed
+        
+    }//GEN-LAST:event_botonEnviarKeyPressed
+
+    private void entradaTextoKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_entradaTextoKeyPressed
+        if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
+            sendMessage();
+        }
+    }//GEN-LAST:event_entradaTextoKeyPressed
+
+    /**
+     * Envia el mensaje al servidor y lo añade en el chat
+     */
+    private void sendMessage(){
         /*
         cliente.enviarMensajeTexto(entradaTexto.getText());
         textPane.setText(textPane.getText() + "\n" + entradaTexto.getText());
@@ -165,22 +192,36 @@ public class Chat extends javax.swing.JFrame {
 
         // Define a style for user's text
         Style styleUser = textPane.addStyle("User Style", null);
-        StyleConstants.setForeground(styleUser, Color.BLUE);
+        StyleConstants.setForeground(styleUser, Color.DARK_GRAY);
         StyleConstants.setBold(styleUser, true);
 
         // Add user's text with the defined style
         try {
-            doc.insertString(doc.getLength(), "\n" + entradaTexto.getText(), styleUser);
+            doc.insertString(doc.getLength(), "\n" +
+                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("(HH:mm)")) + " " +
+                    cliente.getNombre() + ": " + entradaTexto.getText(), styleUser);
         } catch (BadLocationException e) {
             e.printStackTrace();
         }
 
         entradaTexto.setText("");
+    }
 
+    public void addMessage(String message){
+        // Get the StyledDocument from the JTextPane
+        StyledDocument doc = textPane.getStyledDocument();
 
-    }//GEN-LAST:event_botonEnviarActionPerformed
+        // Define a style for server's text
+        Style styleServer = textPane.addStyle("Message Style", null);
+        StyleConstants.setForeground(styleServer, Color.BLUE);
+        StyleConstants.setBold(styleServer, false);
 
-    public static void addMessage(){
+        // Add server's text with the defined style
+        try {
+            doc.insertString(doc.getLength(), "\n" + message, styleServer);
+        } catch (BadLocationException e) {
+            e.printStackTrace();
+        }
         
     }
 
@@ -190,7 +231,7 @@ public class Chat extends javax.swing.JFrame {
 
         // Define a style for server's text
         Style styleServer = textPane.addStyle("Server Style", null);
-        StyleConstants.setForeground(styleServer, Color.GREEN);
+        StyleConstants.setForeground(styleServer, Color.RED);
         StyleConstants.setBold(styleServer, false);
 
         // Add server's text with the defined style

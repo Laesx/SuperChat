@@ -103,3 +103,5 @@ public class Cliente {
 In this code, the `TestServidor` class accepts incoming connections and creates a new `ClientHandler` for each one. The `ClientHandler` class reads messages from its client and broadcasts them to all other clients. The `Cliente` class connects to the server and sends and receives messages.
 
 This is a basic implementation and there are many ways to improve and expand it. For example, you could add support for different types of messages (like private messages or system messages), handle disconnections gracefully, or add a GUI.
+
+
