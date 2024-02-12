@@ -11,6 +11,7 @@ import java.util.ArrayList;
 
 import static superchat.Helper.Historial.guardarMensajeTexto;
 import static superchat.Helper.Historial.recuperarChat;
+import static superchat.Helper.UserCredentials.checkCredentials;
 
 public class Servidor {
     private ServerSocket serverSocket;
@@ -59,6 +60,7 @@ public class Servidor {
         clientThread.sendServerMessage("Bienvenido a SuperChat. Escribe /help para ver los comandos disponibles.");
         clientThread.sendServerMessage("Te has unido a " + chatRooms.get(0).getNombre());
         // TODO Provisionalmente llamar a un método que envíe el chat a los clientes
+        // Que lo maneje el cliente con la polla
         clientThread.sendMessage(recuperarChat(clientThread.getSalaTexto().getNombre()));
     }
 
@@ -120,7 +122,7 @@ public class Servidor {
             case "/help":
                 sender.sendServerMessage("Comandos disponibles: /nick, /list, /msg, /quit, /help");
                 sender.sendServerMessage("Comandos de sala: /create, /join, /leave, /room");
-                sender.sendServerMessage("Para saber más sobre un comando, escribe /help [comando]");
+                //sender.sendServerMessage("Para saber más sobre un comando, escribe /help [comando]");
                 break;
             case "/join", "$joinRoom":
                 for (ChatRoom chatRoom : chatRooms) {
@@ -162,6 +164,15 @@ public class Servidor {
                 */
                 for (ChatRoom chatRoom : chatRooms) {
                     sender.sendMessage("$roomName " + chatRoom.getNombre());
+                }
+                break;
+            case "$checkLogin":
+                boolean loginCheck = checkCredentials(parts[1], parts[2]);
+                if (loginCheck) {
+                    sender.sendMessage("$login true");
+                    sender.setNombre(parts[1]);
+                } else {
+                    sender.sendMessage("$login false");
                 }
                 break;
             default:

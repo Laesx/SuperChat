@@ -8,6 +8,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+import static superchat.Helper.Auxiliar.formatearMensaje;
 import static superchat.Helper.Historial.guardarMensajeTexto;
 
 public class ChatRoom {
@@ -28,13 +29,14 @@ public class ChatRoom {
     }
 
     public synchronized void broadcast(String message, ClientHandler sender) throws IOException {
-        // TODO Standarizar esto a lo mejor?
-        String formattedMessage = LocalDateTime.now().format(DateTimeFormatter.ofPattern("(HH:mm)")) + " " + sender.getNombre() + ": " + message;
+        //String formattedMessage = LocalDateTime.now().format(DateTimeFormatter.ofPattern("(HH:mm)")) + " " + sender.getNombre() + ": " + message;
+        String formattedMessage = formatearMensaje(message, sender.getNombre());
         for (ClientHandler client : clients) {
             if (client != sender) {
                 client.sendMessage(formattedMessage);
             }
         }
+        // TODO quitar esto
         System.out.println(formattedMessage);
         // Lo guarda en el archivo de texto
         guardarMensajeTexto(formattedMessage, nombre);

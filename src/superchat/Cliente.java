@@ -5,6 +5,9 @@ import superchat.GUI.Chat;
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class Cliente {
 
@@ -96,12 +99,43 @@ public class Cliente {
             case "$setRoom":
                 chat.setRoomLabel(parts[1]);
                 break;
+            case "$login":
+                //chat.addServerMessage("Usuario " + parts[1] + " ha iniciado sesión");
+                if (loginLatch != null) {
+                    loginLatch.countDown();
+                }
+                if (parts[1].equals("true")){
+                    loggedUser = true;
+                }
+                break;
             default:
                 chat.addServerMessage("Comando no reconocido: " + comando);
                 System.out.println("Comando no reconocido: " + comando);
                 break;
         }
 
+    }
+
+
+    private boolean loggedUser = false;
+    // Con este objeto podemos esperar a que nos llegue una respuesta del servidor.
+    private CountDownLatch loginLatch;
+
+    public boolean isLoggedIn() {
+        return loggedUser;
+    }
+
+    public boolean checkLogin(String user, String pass) throws InterruptedException, TimeoutException {
+        loginLatch = new CountDownLatch(1);
+        enviarMensajeTexto("$checkLogin " + user + " " + pass);
+        // Esperar 5 segundos a que el servidor responda
+        if (!loginLatch.await(5, TimeUnit.SECONDS)) {
+            throw new TimeoutException("Timeout waiting for server response");
+        }
+        if (loggedUser){
+            nombre = user;
+        }
+        return loggedUser;
     }
 
     public void stop () throws IOException {
@@ -151,6 +185,19 @@ public class Cliente {
 
     public static void main (String[] args) {
 
+        //Abrimos la comunicación con el puerto de servicio
+        Cliente cliente = new Cliente("localhost",49175);
+        try {
+            //Abrimos la comunicación
+            cliente.start();
+            cliente.abrirCanalesDeTexto();
+        } catch (UnknownHostException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        /*
         String mensaje;
 
         //Abrimos la comunicación con el puerto de servicio
@@ -184,6 +231,7 @@ public class Cliente {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        */
 
     }
 

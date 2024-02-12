@@ -15,9 +15,12 @@ public class UserCredentials {
      */
     public static void storeCredentials(String username, String password) {
         try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(CREDENTIALS_FILE, true)))) {
+            /*
             String encryptedUsername = CipherHelper.encrypt(username);
             String encryptedPassword = CipherHelper.encrypt(password);
             out.println(encryptedUsername + "," + encryptedPassword);
+            */
+            out.println(username + "," + password);
         } catch (IOException e) {
             System.out.println("Error guardando en el archivo: " + e.getMessage());
         }
@@ -33,11 +36,16 @@ public class UserCredentials {
             String line;
             while ((line = in.readLine()) != null) {
                 String[] credentials = line.split(",");
+                if (credentials[0].equals(username) && credentials[1].equals(password)){
+                    return true;
+                }
+                /*
                 String decryptedUsername = CipherHelper.decrypt(credentials[0]);
                 String decryptedPassword = CipherHelper.decrypt(credentials[1]);
                 if (decryptedUsername.equals(username) && decryptedPassword.equals(password)) {
                     return true;
                 }
+                */
             }
         } catch (IOException e) {
             System.out.println("Error leyendo archivo: " + e.getMessage());

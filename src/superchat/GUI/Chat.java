@@ -15,6 +15,9 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.concurrent.TimeoutException;
+
+import static superchat.Helper.Auxiliar.formatearMensaje;
 
 /**
  *
@@ -32,13 +35,14 @@ public class Chat extends javax.swing.JFrame {
     public Chat() {
         initComponents();
         startCliente();
+        new Login(this, true, this).setVisible(true);
 
+        System.out.println("Test para ver una cosa...");
         //modeloLista = new ModeloLista();
         modeloLista = new DefaultListModel<>();
         jList.setModel(modeloLista);
 
         setNombre(cliente.getNombre());
-
         cliente.enviarMensajeTexto("$getRooms");
     }
 
@@ -49,6 +53,15 @@ public class Chat extends javax.swing.JFrame {
     public void addRoom(String room){
         System.out.println("Añadiendo sala: " + room);
         modeloLista.addElement(room);
+    }
+
+    public boolean isLoggedIn() {
+        return cliente.isLoggedIn();
+    }
+
+    public boolean checkLogin(String user, String pass) throws InterruptedException, TimeoutException {
+        //cliente.enviarMensajeTexto("$checkLogin " + user + " " + pass);
+        return cliente.checkLogin(user, pass);
     }
     
     private void startCliente(){
@@ -104,7 +117,7 @@ public class Chat extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jLabel1.setFont(new java.awt.Font("Segoe UI Black", 0, 18)); // NOI18N
-        jLabel1.setText("SUPER-CHAT");
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icon/logo.icon.png"))); // NOI18N
 
         jList.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
@@ -137,6 +150,7 @@ public class Chat extends javax.swing.JFrame {
             }
         });
 
+        textPane.setEditable(false);
         jScrollPane2.setViewportView(textPane);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -180,9 +194,9 @@ public class Chat extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(roomButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jScrollPane1)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(roomButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 169, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addGroup(layout.createSequentialGroup()
@@ -263,11 +277,10 @@ public class Chat extends javax.swing.JFrame {
         StyleConstants.setForeground(styleUser, Color.DARK_GRAY);
         StyleConstants.setBold(styleUser, true);
 
+        String mensaje = formatearMensaje(entradaTexto.getText(), cliente.getNombre());
         // Add user's text with the defined style
         try {
-            doc.insertString(doc.getLength(),
-                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("(HH:mm)")) + " " +
-                    cliente.getNombre() + ": " + entradaTexto.getText() + "\n", styleUser);
+            doc.insertString(doc.getLength(), mensaje + "\n", styleUser);
         } catch (BadLocationException e) {
             System.err.println("Error al añadir el mensaje al chat: " + e.getMessage());
         }
