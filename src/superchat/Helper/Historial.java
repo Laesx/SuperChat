@@ -9,7 +9,10 @@ import java.util.ArrayList;
 public class Historial {
 
 
-    // Guarda el mensaje en un archivo de texto
+    /** Guarda el mensaje en un archivo de texto
+     * @param mensaje    Mensaje a guardar
+     * @param nombreSala Nombre de la sala
+     */
     public static void guardarMensajeTexto(String mensaje, String nombreSala) {
         try {
             FileWriter fw = new FileWriter("ficheros/chat_"+ nombreSala +".txt", true);
@@ -18,8 +21,12 @@ public class Historial {
         } catch (Exception e) {
             System.out.println("Error guardando el archivo de texto: " + e);
         }
-    }// Recupera el chat desde el archivo de texto
+    }
 
+    /** Recupera el chat desde el archivo de texto
+     * @param nombreSala Nombre de la sala
+     * @return Chat de la sala
+     */
     public static String recuperarChat(String nombreSala) {
         String chat = "";
         try {

@@ -24,7 +24,7 @@ public class Login extends javax.swing.JDialog {
         initComponents();
         this.chat = chat;
 
-        // Add a window listener
+        // Window listener que cierra el programa si el usuario no está logeado
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -65,13 +65,22 @@ public class Login extends javax.swing.JDialog {
         passLabel = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
         botonLogin = new javax.swing.JButton();
+        jSeparator1 = new javax.swing.JSeparator();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Login");
         setPreferredSize(new java.awt.Dimension(375, 270));
+        setResizable(false);
 
         jLabel2.setText("Usuario:");
 
         jLabel3.setText("Contraseña:");
+
+        passLabel.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                passLabelKeyPressed(evt);
+            }
+        });
 
         jLabel4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icon/logo.small.png"))); // NOI18N
         jLabel4.setMaximumSize(new java.awt.Dimension(300, 250));
@@ -93,7 +102,7 @@ public class Login extends javax.swing.JDialog {
                 .addGap(87, 87, 87))
             .addGroup(layout.createSequentialGroup()
                 .addGap(58, 58, 58)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addComponent(botonLogin)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -101,8 +110,9 @@ public class Login extends javax.swing.JDialog {
                             .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(userLabel)
-                            .addComponent(passLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addComponent(userLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 176, Short.MAX_VALUE)
+                            .addComponent(passLabel)))
+                    .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.LEADING))
                 .addContainerGap(61, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -119,14 +129,23 @@ public class Login extends javax.swing.JDialog {
                     .addComponent(jLabel3)
                     .addComponent(passLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
-                .addComponent(botonLogin)
-                .addContainerGap(45, Short.MAX_VALUE))
+                .addComponent(botonLogin, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(17, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void botonLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonLoginActionPerformed
+        login();
+    }//GEN-LAST:event_botonLoginActionPerformed
+
+    /**
+     * Funcion que comprueba el login
+     */
+    private void login() {
         // Comprobar que no están vacíos
         if (getUser().isEmpty() || getPass().isEmpty()){
             JOptionPane.showMessageDialog(this, "Usuario o contraseña vacíos","Error: ",JOptionPane.ERROR_MESSAGE);
@@ -156,7 +175,14 @@ public class Login extends javax.swing.JDialog {
                     "Usuario o contraseña incorrectos",
                     "Error: ",JOptionPane.ERROR_MESSAGE);
         }
-    }//GEN-LAST:event_botonLoginActionPerformed
+    }
+
+    private void passLabelKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_passLabelKeyPressed
+        // TODO add your handling code here:
+        if (evt.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
+            login();
+        }
+    }//GEN-LAST:event_passLabelKeyPressed
 
     /**
      * @param args the command line arguments
@@ -206,6 +232,7 @@ public class Login extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTextField passLabel;
     private javax.swing.JTextField userLabel;
     // End of variables declaration//GEN-END:variables

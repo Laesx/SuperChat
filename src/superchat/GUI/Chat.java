@@ -4,6 +4,7 @@
  */
 package superchat.GUI;
 
+//import com.formdev.flatlaf.FlatDarculaLaf;
 import superchat.Cliente;
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
@@ -30,26 +31,33 @@ public class Chat extends javax.swing.JFrame {
     private final DefaultListModel<String> modeloLista;
 
     /**
-     * Creates new form Chat
+     * Clase GUI para el chat
      */
     public Chat() {
         initComponents();
         startCliente();
+        // Inicia el login para que el usuario se identifique
         new Login(this, true, this).setVisible(true);
 
-        System.out.println("Test para ver una cosa...");
-        //modeloLista = new ModeloLista();
+        //Modelo por defecto de la lista de salas
         modeloLista = new DefaultListModel<>();
         jList.setModel(modeloLista);
 
+        //Añadimos las salas por defecto
         setNombre(cliente.getNombre());
         cliente.enviarMensajeTexto("$getRooms");
     }
 
+    /**
+     * @param nombre Nombre del usuario
+     */
     public void setNombre(String nombre){
         userLabel.setText("Usuario: " + nombre);
     }
 
+    /** Añade una sala a la lista de salas
+     * @param room Nombre de la sala
+     */
     public void addRoom(String room){
         System.out.println("Añadiendo sala: " + room);
         modeloLista.addElement(room);
@@ -59,11 +67,18 @@ public class Chat extends javax.swing.JFrame {
         return cliente.isLoggedIn();
     }
 
+    /** Comprueba si el usuario y contraseña son correctos
+     * @param user Nombre de usuario
+     * @param pass Contraseña
+     * @return true si el usuario y contraseña son correctos, false en caso contrario
+     */
     public boolean checkLogin(String user, String pass) throws InterruptedException, TimeoutException {
-        //cliente.enviarMensajeTexto("$checkLogin " + user + " " + pass);
         return cliente.checkLogin(user, pass);
     }
-    
+
+    /**
+     * Inicia la clase Cliente que maneja la comunicación con el servidor
+     */
     private void startCliente(){
 
         //Abrimos la comunicación con el puerto de servicio
@@ -71,15 +86,16 @@ public class Chat extends javax.swing.JFrame {
         try {
             //Abrimos la comunicación
             cliente.start();
-            cliente.abrirCanalesDeTexto();
+            //cliente.abrirCanalesDeTexto();
 
-        } catch (UnknownHostException e) {
-            System.out.println("Error al conectar al servidor: " + e.getMessage());
         } catch (IOException e) {
-            System.out.println("Error en la comunicacion con el servidor: " + e.getMessage());
+            JOptionPane.showMessageDialog(this, e.getMessage(),"Error: ",JOptionPane.ERROR_MESSAGE);
         }
     }
 
+    /**
+     * Detiene la clase Cliente
+     */
     public void stopCliente(){
         try {
             cliente.cerrarCanalesDeTexto();
@@ -89,6 +105,9 @@ public class Chat extends javax.swing.JFrame {
         }
     }
 
+    /** Cambia el titulo a la sala seleccionada
+     * @param room Nombre de la sala
+     */
     public void setRoomLabel(String room){
         roomLabel.setText("Sala Actual: " + room);
     }
@@ -115,6 +134,8 @@ public class Chat extends javax.swing.JFrame {
         roomLabel = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("SuperChat");
+        setResizable(false);
 
         jLabel1.setFont(new java.awt.Font("Segoe UI Black", 0, 18)); // NOI18N
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icon/logo.icon.png"))); // NOI18N
@@ -263,22 +284,18 @@ public class Chat extends javax.swing.JFrame {
      * Envia el mensaje al servidor y lo añade en el chat
      */
     private void sendMessage(){
-        /*
-        cliente.enviarMensajeTexto(entradaTexto.getText());
-        textPane.setText(textPane.getText() + "\n" + entradaTexto.getText());
-        entradaTexto.setText("");*/
         cliente.enviarMensajeTexto(entradaTexto.getText());
 
-        // Get the StyledDocument from the JTextPane
+        // Cogemos el documento del JTextPane
         StyledDocument doc = textPane.getStyledDocument();
 
-        // Define a style for user's text
+        // Define el estilo del texto del usuario
         Style styleUser = textPane.addStyle("User Style", null);
-        StyleConstants.setForeground(styleUser, Color.DARK_GRAY);
-        StyleConstants.setBold(styleUser, true);
+        StyleConstants.setForeground(styleUser, Color.GREEN);
+        //StyleConstants.setBold(styleUser, true);
 
         String mensaje = formatearMensaje(entradaTexto.getText(), cliente.getNombre());
-        // Add user's text with the defined style
+        // Añade el mensaje al chat con el estilo definido
         try {
             doc.insertString(doc.getLength(), mensaje + "\n", styleUser);
         } catch (BadLocationException e) {
@@ -289,15 +306,15 @@ public class Chat extends javax.swing.JFrame {
     }
 
     public void addMessage(String message){
-        // Get the StyledDocument from the JTextPane
+        // Cogemos el documento del JTextPane
         StyledDocument doc = textPane.getStyledDocument();
 
-        // Define a style for server's text
+        // Define el estilo del mensaje del servidor
         Style styleServer = textPane.addStyle("Message Style", null);
-        StyleConstants.setForeground(styleServer, Color.BLUE);
+        StyleConstants.setForeground(styleServer, Color.WHITE);
         StyleConstants.setBold(styleServer, false);
 
-        // Add server's text with the defined style
+        // Añade el mensaje al chat con el estilo definido
         try {
             doc.insertString(doc.getLength(), message + "\n", styleServer);
         } catch (BadLocationException e) {
@@ -307,15 +324,15 @@ public class Chat extends javax.swing.JFrame {
     }
 
     public void addServerMessage(String message) {
-        // Get the StyledDocument from the JTextPane
+        // Cogemos el documento del JTextPane
         StyledDocument doc = textPane.getStyledDocument();
 
-        // Define a style for server's text
+        // Define el estilo de los mensajes internos del servidor
         Style styleServer = textPane.addStyle("Server Style", null);
         StyleConstants.setForeground(styleServer, Color.RED);
         StyleConstants.setBold(styleServer, false);
 
-        // Add server's text with the defined style
+        // Añade el mensaje al chat con el estilo definido
         try {
             doc.insertString(doc.getLength(), message + "\n", styleServer);
         } catch (BadLocationException e) {
@@ -332,6 +349,8 @@ public class Chat extends javax.swing.JFrame {
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
          * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
          */
+
+        /*
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -339,16 +358,17 @@ public class Chat extends javax.swing.JFrame {
                     break;
                 }
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Chat.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Chat.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Chat.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException |
+                 UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(Chat.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
+        */
+
+        // Cambia la skin de la aplicación por FlatLaf
+        // Se hace aqui ya que tiene que ser antes de que se inicie la Ventana Principal
+        com.formdev.flatlaf.FlatDarculaLaf.setup();
+
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {

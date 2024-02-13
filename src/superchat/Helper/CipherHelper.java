@@ -5,6 +5,9 @@ import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
+/**
+ * Clase con métodos para encriptar y desencriptar mensajes
+ */
 public class CipherHelper {
     private static final String ALGORITHM = "AES";
     private static final byte[] KEY = "asdf234fsdva%SECRETO@f4f_adfafaAAaad;".getBytes(StandardCharsets.UTF_8);

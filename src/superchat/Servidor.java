@@ -59,8 +59,7 @@ public class Servidor {
         clientThread.sendMessage("$setRoom " + chatRooms.get(0).getNombre());
         clientThread.sendServerMessage("Bienvenido a SuperChat. Escribe /help para ver los comandos disponibles.");
         clientThread.sendServerMessage("Te has unido a " + chatRooms.get(0).getNombre());
-        // TODO Provisionalmente llamar a un método que envíe el chat a los clientes
-        // Que lo maneje el cliente con la polla
+        // llamar a un método que envíe el chat por defecto a los clientes cuando se conectan
         clientThread.sendMessage(recuperarChat(clientThread.getSalaTexto().getNombre()));
     }
 
@@ -77,6 +76,11 @@ public class Servidor {
 
     }
 
+    /** Envía un mensaje a todos los clientes conectados, menos al que lo envía, y lo guarda en el archivo de texto
+     * @param message Mensaje a enviar
+     * @param sender Cliente que envía el mensaje
+     * @throws IOException Lanza una excepción si no se puede enviar el mensaje
+     */
     public void broadcast(String message, ClientHandler sender) throws IOException {
         String formattedMessage = LocalDateTime.now().format(DateTimeFormatter.ofPattern("(HH:mm)")) + " " + sender.getNombre() + ": " + message;
         for (ClientHandler client : clientes) {
@@ -89,7 +93,11 @@ public class Servidor {
         //guardarMensajeTexto(formattedMessage);
     }
 
-    // TODO Esto seguramente habría que hacerlo más seguro para que los usuarios no puedan enviar comandos que no deben
+    /** Procesa los comandos que envía el cliente
+     * @param mensaje Mensaje que contiene el comando
+     * @param sender Cliente que envía el comando
+     * @throws IOException Lanza una excepción si no se puede enviar el mensaje
+     */
     public void commands(String mensaje, ClientHandler sender) throws IOException {
         String[] parts = mensaje.split(" ");
         switch (parts[0]) {
@@ -99,10 +107,11 @@ public class Servidor {
                 sender.sendMessage("$setUser " + sender.getNombre());
                 break;
             case "/list":
-                // TODO Implementar un método para enviar la lista de clientes
+                String lista = "Usuarios conectados: ";
                 for (ClientHandler client : clientes) {
-                    sender.sendMessage("Sistema: "+ client.getNombre());
+                    lista += client.getNombre() + ", ";
                 }
+                sender.sendServerMessage(lista);
                 break;
             case "/msg":
                 for (ClientHandler client : clientes) {
@@ -154,14 +163,6 @@ public class Servidor {
                 sender.sendMessage(recuperarChat(sender.getSalaTexto().getNombre()));
                 break;
             case "$getRooms":
-                //System.out.println("Enviando lista de salas");
-                /*
-                String listaSalas = "";
-                for (ChatRoom chatRoom : chatRooms) {
-                    listaSalas += "$roomName" + chatRoom.getNombre() + "\n";
-                }
-                sender.sendMessage(listaSalas);
-                */
                 for (ChatRoom chatRoom : chatRooms) {
                     sender.sendMessage("$roomName " + chatRoom.getNombre());
                 }
@@ -182,7 +183,9 @@ public class Servidor {
     }
 
 
-
+    /** Cierra el servidor
+     * @throws IOException Lanza una excepción si no se puede cerrar el socket
+     */
     public void stop() throws IOException {
         //System.out.println(" (ServidorAntiguo) Cerrando conexiones...");
         serverSocket.close();

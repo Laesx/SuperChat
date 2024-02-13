@@ -3,6 +3,9 @@ package superchat;
 import java.io.*;
 import java.net.Socket;
 
+/**
+ * Clase para manejar las conexiones con los clientes
+ */
 class ClientHandler extends Thread {
     private Socket socket;
     private Servidor server;
@@ -15,11 +18,18 @@ class ClientHandler extends Thread {
     private BufferedReader br;
     private PrintWriter pw;
 
+    // Nombre del cliente, por defecto "Anónimo"
     private String nombre = "Anónimo";
 
+    // Sala de texto a la que está conectado el cliente
     private ChatRoom salaTexto;
 
 
+    /** Constructor de la clase
+     * @param socket Conexión con el cliente
+     * @param server Servidor
+     * @throws IOException Error de entrada/salida
+     */
     public ClientHandler(Socket socket, Servidor server) throws IOException {
         this.socket = socket;
         this.server = server;
@@ -37,16 +47,23 @@ class ClientHandler extends Thread {
 
     }
 
+    /** Envía un mensaje al cliente
+     * @param message Mensaje a enviar
+     */
     public void sendMessage(String message) {
         pw.println(message);
     }
 
+    /** Envía un mensaje al cliente desde el servidor
+     * @param message Mensaje a enviar
+     */
     public void sendServerMessage(String message) {
         pw.println("Sistema: " + message);
     }
 
     @Override
     public void run() {
+        // Aquí se manejarán los mensajes del cliente
         try {
             String mensaje;
             while ((mensaje = br.readLine()) != null) {
@@ -62,12 +79,12 @@ class ClientHandler extends Thread {
                 salaTexto.broadcast(mensaje, this);
             }
         } catch (IOException e) {
-            System.out.println("Perdida conexión con el cliente: " + e);
+            System.err.println("Perdida conexión con el cliente: " + e);
         } finally {
             try {
                 socket.close();
             } catch (IOException e) {
-                System.out.println("No se ha podido cerrar el socket: " + e);
+                System.err.println("No se ha podido cerrar el socket: " + e);
             }
         }
     }

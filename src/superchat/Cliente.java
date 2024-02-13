@@ -4,7 +4,6 @@ import superchat.GUI.Chat;
 
 import java.io.*;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -19,7 +18,8 @@ public class Cliente {
 
     // Objetos para envío de cadenas
     private InputStreamReader isr;
-    private BufferedReader br;
+    private BufferedReader reader;
+
     private PrintWriter pw;
 
     public String getNombre() {
@@ -31,9 +31,10 @@ public class Cliente {
         chat.setNombre(nombre);
     }
 
-    // Guardar el nombre del usuario
+    // Nombre del usuario
     private String nombre = "Anónimo";
 
+    // GUI del chat
     private Chat chat;
 
     public Cliente (String serverIP, int serverPort, Chat chat) {
@@ -47,46 +48,55 @@ public class Cliente {
         this.serverPort = serverPort;
     }
 
-    public void start () throws UnknownHostException, IOException {
+    /** Establece la conexión con el servidor
+     * @throws IOException Lanza una excepción si no se puede establecer la conexión
+     */
+    public void start () throws IOException {
         //System.out.println("(Cliente) Estableciendo conexión...");
         socket = new Socket(serverIP,serverPort);
         os = socket.getOutputStream();
         is = socket.getInputStream();
         //System.out.println("(Cliente) Conexión establecida.");
+        abrirCanalesDeTexto();
 
         // Crear un hilo que continuamente lea y muestre los mensajes del servidor
         // Esto es necesario porque el hilo principal se bloquearía al estar leyendo los mensajes
         new Thread(() -> {
             try {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(is));
                 String message;
-
                 while ((message = reader.readLine()) != null) {
-                    //System.out.println("Mensaje del servidor: " + message);
+                    // Si el mensaje empieza por Sistema:, es un mensaje interno del servidor y se envia en otro formato
                     if (message.startsWith("Sistema:")){
                         chat.addServerMessage(message);
                         continue;
                     }
+                    // Si el mensaje empieza por $disconnect, el servidor ha cerrado la conexión
                     if (message.startsWith("$disconnect")){
                         chat.addServerMessage("El servidor ha cerrado la conexión");
                         stop();
+                        chat.dispose();
                         break;
                     }
+                    // Si el mensaje empieza por $, es un comando y no se enviará al chat
                     if (message.startsWith("$")){
                         //chat.addServerMessage(message);
                         handleCommands(message);
                         continue;
                     }
-                    System.out.println(message);
+                    //System.out.println(message);
                     chat.addMessage(message);
                 }
             } catch (IOException e) {
+                System.err.println("Error al recibir mensajes del servidor: " + e);
                 chat.addServerMessage("Error al recibir mensajes del servidor");
                 //e.printStackTrace();
             }
         }).start();
     }
 
+    /** Maneja los comandos recibidos del servidor
+     * @param comando Comando recibido del servidor
+     */
     private void handleCommands(String comando){
         String[] parts = comando.split(" ");
         switch (parts[0]) {
@@ -118,19 +128,24 @@ public class Cliente {
 
 
     private boolean loggedUser = false;
-    // Con este objeto podemos esperar a que nos llegue una respuesta del servidor.
+    // Este objeto es para bloquear el hilo hasta que nos llegue una respuesta del servidor.
     private CountDownLatch loginLatch;
 
     public boolean isLoggedIn() {
         return loggedUser;
     }
 
+    /** Comprueba si el usuario y contraseña son correctos
+     * @param user Nombre de usuario
+     * @param pass Contraseña
+     * @return true si el usuario y contraseña son correctos, false en caso contrario
+     */
     public boolean checkLogin(String user, String pass) throws InterruptedException, TimeoutException {
         loginLatch = new CountDownLatch(1);
         enviarMensajeTexto("$checkLogin " + user + " " + pass);
         // Esperar 5 segundos a que el servidor responda
         if (!loginLatch.await(5, TimeUnit.SECONDS)) {
-            throw new TimeoutException("Timeout waiting for server response");
+            throw new TimeoutException("Se ha acabado el tiempo de espera para el login");
         }
         if (loggedUser){
             nombre = user;
@@ -138,48 +153,41 @@ public class Cliente {
         return loggedUser;
     }
 
+    /** Cierra el cliente
+     * @throws IOException Lanza una excepción si no se puede cerrar el socket
+     */
     public void stop () throws IOException {
-        //System.out.println("(Cliente) Cerrando conexiones.");
-        is.close();
-        os.close();
+        // El socket al cerrarse ya cierra los canales de entrada y salida automáticamente
         socket.close();
-        //System.out.println(" (Cliente) Conexiones cerradas.");
     }
 
-    // abrimos los canales de lectura y de escritura - Igual que en el servidor
+    /**
+     * Abre los canales de texto para enviar y recibir mensajes
+     */
     public void abrirCanalesDeTexto() {
-        //System.out.println(" (Cliente) Abriendo canales de texto...");
         //Canales de lectura
         isr = new InputStreamReader(is);
-        br = new BufferedReader(isr);
+        reader = new BufferedReader(isr);
         //Canales de escritura
         pw = new PrintWriter(os, true);
-        //System.out.println("(Cliente) Cerrando canales de texto.");
     }
 
-    // cerramos los canales de lectura y de escritura - Igual que en el servidor
+    /**
+     * Cierra los canales de texto
+     */
     public void cerrarCanalesDeTexto() throws IOException {
-        //System.out.println(" (Cliente) Cerrando canales de texto...");
         //Canales de lectura
-        br.close();
+        reader.close();
         isr.close();
         //Canales de escritura
         pw.close();
-        //System.out.println("(Cliente) Cerrando canales de texto.");
     }
 
-    public String leerMensajeTexto()  throws IOException {
-        //System.out.println(" (Cliente) Leyendo mensaje...");
-        String mensaje = br.readLine();
-        //System.out.println(" (Cliente) Mensaje leido.");
-        return mensaje;
-    }
-
+    /** Lee un mensaje de texto del servidor
+     * @param mensaje Mensaje a enviar
+     */
     public void enviarMensajeTexto(String mensaje) {
-        //System.out.println(" (Cliente) Enviando mensaje...");
         pw.println(mensaje);
-
-        //System.out.println(" (Cliente) Mensaje enviado.");
     }
 
 
@@ -191,8 +199,6 @@ public class Cliente {
             //Abrimos la comunicación
             cliente.start();
             cliente.abrirCanalesDeTexto();
-        } catch (UnknownHostException e) {
-            throw new RuntimeException(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -233,9 +239,5 @@ public class Cliente {
         }
         */
 
-    }
-
-    public void setChat(Chat chat) {
-        this.chat = chat;
     }
 }

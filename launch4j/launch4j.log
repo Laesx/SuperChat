@@ -1,0 +1,150 @@
+
+
+Version:	3.50
+CmdLine:	C:\Users\losgu\OneDrive\Insti\Programacion de procesos y servicios\Tema 3\Practicas\SuperChat\launch4J\Test.exe --l4j-debug
+JNI:		No
+WOW64:		Yes
+Working dir:	C:\Users\losgu\OneDrive\Insti\Programacion de procesos y servicios\Tema 3\Practicas\SuperChat\launch4J\.
+Requires JDK:	No
+Requires 64-Bit: No
+Java min ver:	
+Java max ver:	
+JRE paths:	C:\Program Files\OpenJDK\jdk-17.0.2
+Check launcher:	C:\Program Files\OpenJDK\jdk-17.0.2\bin\javaw.exe (not found)
+Error msg:	This application requires a Java Runtime Environment.
+
+
+Version:	3.50
+CmdLine:	C:\Users\losgu\OneDrive\Insti\Programacion de procesos y servicios\Tema 3\Practicas\SuperChat\launch4J\Test.exe --l4j-debug
+JNI:		No
+WOW64:		Yes
+Working dir:	C:\Users\losgu\OneDrive\Insti\Programacion de procesos y servicios\Tema 3\Practicas\SuperChat\launch4J\.
+Requires JDK:	No
+Requires 64-Bit: No
+Java min ver:	
+Java max ver:	
+Substitute:	JAVA_HOME = 
+JRE paths:	
+Error msg:	This application requires a Java Runtime Environment.
+Error:		El sistema no encontró la opción de entorno especificada.
+
+
+
+Version:	3.50
+CmdLine:	C:\Users\losgu\OneDrive\Insti\Programacion de procesos y servicios\Tema 3\Practicas\SuperChat\launch4J\Test.exe --l4j-debug
+JNI:		No
+WOW64:		Yes
+Working dir:	C:\Users\losgu\OneDrive\Insti\Programacion de procesos y servicios\Tema 3\Practicas\SuperChat\launch4J\.
+Requires JDK:	No
+Requires 64-Bit: No
+Java min ver:	
+Java max ver:	
+JRE paths:	C:\Users\losgu\.jdks\corretto-17.0.9\bin
+Check launcher:	C:\Users\losgu\.jdks\corretto-17.0.9\bin\javaw.exe (OK)
+Version string: 1.017.000_009 / 64-Bit (OK)
+Main class:	superchat.GUI.Chat
+Add classpath:	lib\flatlaf-3.3.jar
+Launcher:	C:\Users\losgu\.jdks\corretto-17.0.9\bin\javaw.exe
+Launcher args:	-classpath "C:\Users\losgu\OneDrive\Insti\Programacion de procesos y servicios\Tema 3\Practicas\SuperChat\launch4J\Test.exe;lib\flatlaf-3.3.jar" superchat.GUI.Chat
+Args length:	163/32768 chars
+Exit code:	0
+
+
+Version:	3.50
+CmdLine:	C:\Users\losgu\OneDrive\Insti\Programacion de procesos y servicios\Tema 3\Practicas\SuperChat\launch4J\Test.exe --l4j-debug
+JNI:		No
+WOW64:		Yes
+Working dir:	C:\Users\losgu\OneDrive\Insti\Programacion de procesos y servicios\Tema 3\Practicas\SuperChat\launch4J\.
+Requires JDK:	No
+Requires 64-Bit: No
+Java min ver:	
+Java max ver:	
+JRE paths:	C:\Users\losgu\.jdks\corretto-17.0.9\bin
+Check launcher:	C:\Users\losgu\.jdks\corretto-17.0.9\bin\javaw.exe (OK)
+Version string: 1.017.000_009 / 64-Bit (OK)
+Main class:	superchat.GUI.Chat
+Add classpath:	lib\flatlaf-3.3.jar
+Launcher:	C:\Users\losgu\.jdks\corretto-17.0.9\bin\javaw.exe
+Launcher args:	-classpath "C:\Users\losgu\OneDrive\Insti\Programacion de procesos y servicios\Tema 3\Practicas\SuperChat\launch4J\Test.exe;lib\flatlaf-3.3.jar" superchat.GUI.Chat
+Args length:	163/32768 chars
+Exit code:	0
+
+
+Version:	3.50
+CmdLine:	C:\Users\losgu\OneDrive\Insti\Programacion de procesos y servicios\Tema 3\Practicas\SuperChat\launch4J\Test.exe --l4j-debug
+JNI:		No
+WOW64:		Yes
+Working dir:	C:\Users\losgu\OneDrive\Insti\Programacion de procesos y servicios\Tema 3\Practicas\SuperChat\launch4J\.
+Requires JDK:	No
+Requires 64-Bit: No
+Java min ver:	
+Java max ver:	
+JRE paths:	C:\Users\losgu\.jdks\corretto-17.0.9\bin
+Check launcher:	C:\Users\losgu\.jdks\corretto-17.0.9\bin\javaw.exe (OK)
+Version string: 1.017.000_009 / 64-Bit (OK)
+Main class:	superchat.GUI.Chat
+Add classpath:	lib\flatlaf-3.3.jar
+Launcher:	C:\Users\losgu\.jdks\corretto-17.0.9\bin\javaw.exe
+Launcher args:	-classpath "C:\Users\losgu\OneDrive\Insti\Programacion de procesos y servicios\Tema 3\Practicas\SuperChat\launch4J\Test.exe;lib\flatlaf-3.3.jar" superchat.GUI.Chat
+Args length:	163/32768 chars
+Exit code:	0
+
+
+Version:	3.50
+CmdLine:	C:\Users\losgu\OneDrive\Insti\Programacion de procesos y servicios\Tema 3\Practicas\SuperChat\launch4J\Test.exe --l4j-debug
+JNI:		No
+WOW64:		Yes
+Working dir:	C:\Users\losgu\OneDrive\Insti\Programacion de procesos y servicios\Tema 3\Practicas\SuperChat\launch4J\.
+Requires JDK:	No
+Requires 64-Bit: No
+Java min ver:	
+Java max ver:	
+JRE paths:	C:\Users\losgu\.jdks\corretto-17.0.9\bin
+Check launcher:	C:\Users\losgu\.jdks\corretto-17.0.9\bin\javaw.exe (OK)
+Version string: 1.017.000_009 / 64-Bit (OK)
+Main class:	superchat.GUI.Chat
+Add classpath:	lib\flatlaf-3.3.jar
+Launcher:	C:\Users\losgu\.jdks\corretto-17.0.9\bin\javaw.exe
+Launcher args:	-classpath "C:\Users\losgu\OneDrive\Insti\Programacion de procesos y servicios\Tema 3\Practicas\SuperChat\launch4J\Test.exe;lib\flatlaf-3.3.jar" superchat.GUI.Chat
+Args length:	163/32768 chars
+Exit code:	0
+
+
+Version:	3.50
+CmdLine:	C:\Users\losgu\OneDrive\Insti\Programacion de procesos y servicios\Tema 3\Practicas\SuperChat\launch4J\Test.exe --l4j-debug
+JNI:		No
+WOW64:		Yes
+Working dir:	C:\Users\losgu\OneDrive\Insti\Programacion de procesos y servicios\Tema 3\Practicas\SuperChat\launch4J\.
+Requires JDK:	No
+Requires 64-Bit: No
+Java min ver:	
+Java max ver:	
+JRE paths:	C:\Users\losgu\.jdks\corretto-17.0.9\bin
+Check launcher:	C:\Users\losgu\.jdks\corretto-17.0.9\bin\javaw.exe (OK)
+Version string: 1.017.000_009 / 64-Bit (OK)
+Main class:	superchat.GUI.Chat
+Add classpath:	.\lib\*.jar
+Launcher:	C:\Users\losgu\.jdks\corretto-17.0.9\bin\javaw.exe
+Launcher args:	-classpath "C:\Users\losgu\OneDrive\Insti\Programacion de procesos y servicios\Tema 3\Practicas\SuperChat\launch4J\Test.exe" superchat.GUI.Chat
+Args length:	143/32768 chars
+Exit code:	0
+
+
+Version:	3.50
+CmdLine:	C:\Users\losgu\OneDrive\Insti\Programacion de procesos y servicios\Tema 3\Practicas\SuperChat\launch4J\Test.exe --l4j-debug
+JNI:		No
+WOW64:		Yes
+Working dir:	C:\Users\losgu\OneDrive\Insti\Programacion de procesos y servicios\Tema 3\Practicas\SuperChat\launch4J\.
+Requires JDK:	No
+Requires 64-Bit: No
+Java min ver:	
+Java max ver:	
+JRE paths:	C:\Users\losgu\.jdks\corretto-17.0.9\bin
+Check launcher:	C:\Users\losgu\.jdks\corretto-17.0.9\bin\javaw.exe (OK)
+Version string: 1.017.000_009 / 64-Bit (OK)
+Main class:	superchat.GUI.Chat
+Add classpath:	.\lib\*.jar
+Launcher:	C:\Users\losgu\.jdks\corretto-17.0.9\bin\javaw.exe
+Launcher args:	-classpath "C:\Users\losgu\OneDrive\Insti\Programacion de procesos y servicios\Tema 3\Practicas\SuperChat\launch4J\Test.exe" superchat.GUI.Chat
+Args length:	143/32768 chars
+Exit code:	0
